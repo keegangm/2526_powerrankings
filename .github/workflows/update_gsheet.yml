@@ -33,8 +33,8 @@ from google.oauth2.service_account import Credentials
 creds = Credentials.from_service_account_file('creds.json', scopes=["https://www.googleapis.com/auth/spreadsheets"])
 gc = gspread.authorize(creds)
 
-sheet = gc.open_by_url("YOUR_GOOGLE_SHEET_URL").sheet1
-df = pd.read_csv("data.csv")
+sheet = gc.open_by_url("https://docs.google.com/spreadsheets/d/1MAEaEZf3GWABj3Eye_rchKX2WjwCn4VISu-bfaVONhU/edit?hl=en&pli=1&gid=0#gid=0").sheet1
+df = pd.read_csv("power_rankings.csv")
 sheet.clear()
 sheet.update([df.columns.values.tolist()] + df.values.tolist())
 EOF
