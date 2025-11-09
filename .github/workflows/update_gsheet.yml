@@ -1,0 +1,40 @@
+name: Update Google Sheet
+
+on:
+  push:
+    paths:
+      - 'power_rankings.csv'
+  workflow_dispatch:
+
+jobs:
+  update-sheet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install gspread pandas google-auth
+
+      - name: Update Google Sheet
+        env:
+          GSHEET_CREDS: ${{ secrets.GSHEET_CREDS }}
+        run: |
+          echo "$GSHEET_CREDS" > creds.json
+          python - <<EOF
+import gspread
+import pandas as pd
+from google.oauth2.service_account import Credentials
+
+creds = Credentials.from_service_account_file('creds.json', scopes=["https://www.googleapis.com/auth/spreadsheets"])
+gc = gspread.authorize(creds)
+
+sheet = gc.open_by_url("YOUR_GOOGLE_SHEET_URL").sheet1
+df = pd.read_csv("data.csv")
+sheet.clear()
+sheet.update([df.columns.values.tolist()] + df.values.tolist())
+EOF
